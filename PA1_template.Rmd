@@ -44,17 +44,18 @@ nmeandata <- dcast(newmelt, date ~ variable, mean, fill= NaN)
 
 
 
+
 ```
 
 ## What is mean total number of steps taken per day?
 ```{r}
 hist(sumdata$steps, main = "Total Number of Steps Taken Per Day", xlab = "Steps")
 
-mean <- mean(sumdata$steps, na.rm=TRUE)
-median <- median(sumdata$steps, na.rm=TRUE)
+bmean <- mean(sumdata$steps, na.rm=TRUE)
+bmedian <- median(sumdata$steps, na.rm=TRUE)
 
-rmean <- c("Mean:", mean)
-rmedian <- c("Median:", median)
+rmean <- c("Mean:", bmean)
+rmedian <- c("Median:", bmedian)
 
 noquote(rmean)
 noquote(rmedian)
@@ -104,7 +105,19 @@ noquote(rnmedian)
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ```{r}
+mydate <- as.Date(as.character(newdata$date))
+day <- weekdays(mydate)
+daydata <- cbind(newdata, day)
+daydata$weekend <- ifelse(daydata$day  %in% c("Monday","Tuesday","Wednesday","Thursday","Friday"), 'weekday', 'weekend')
 
+daydata <- transform(daydata, weekend = factor(weekend))
+
+aggfact <- aggregate(steps ~ interval+ weekend, data = daydata, FUN = mean)
+
+
+
+library(lattice)
+xyplot(steps ~ interval|weekend, data = aggfact, layout = c(1,2), type= "l")
 
 
 
